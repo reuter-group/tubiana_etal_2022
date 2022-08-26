@@ -1,4 +1,5 @@
 from .Attributes import Attributes
+from .Uniprot import *
 
 import pandas as pd
 import numpy as np
@@ -37,22 +38,38 @@ class Sequence(Attributes):
             return:
                 mapping <dict> : mapping of {pdb:uniprot}
             """
+            
+            #### DEPRECATED CODE ####
+            """
             url = "https://www.uniprot.org/uploadlists/"
 
             params = {
                 "from": "ACC",
                 "to": "ID",
-                "format": "tab",
-                "query": ",".join(uniprot_accs),
+                "format": "tsv",
+                "query": ",".join(uniprot_accs[1:5]),
             }
             data = urllib.parse.urlencode(params)
             data = data.encode("utf-8")
             req = urllib.request.Request(url, data)
+            print("doodle", data)
             with urllib.request.urlopen(req) as f:
                 response = f.read()
+                
+            """
+            
+            job_id = submit_id_mapping(from_db = "UniProtKB_AC-ID", to_db = "UniProtKB", ids= uniprot_accs)
+            
+            if check_id_mapping_results_ready(job_id):
+                link = get_id_mapping_results_link(job_id)
+                results = get_id_mapping_results_search(link)
+                print(results["results"][1:2])
+                mapping= {x["from"] : x["to"]["uniProtkbId"] for x in results["results"]}
+                return mapping
 
             # Yes I know... not understandable, but since "response" is a binary text of the results, this is just
             # to convert the result in a dictionnary... :-)
+            """
             mapping = {}
 
             twoByTwo = list(zip(*[iter(response.decode("utf-8").split()[2:])] * 2))
@@ -61,6 +78,7 @@ class Sequence(Attributes):
                 mapping[uniprot] = gene
 
             return mapping
+            """
 
         DATASET.fillna(np.NaN, inplace=True)  # replace nan properly
         uniprot_accs = DATASET.uniprot_acc.unique()
@@ -83,6 +101,9 @@ class Sequence(Attributes):
                 pdbs <list> : list of all pdb names
             return:
                 mapping <dict> : mapping of {pdb:uniprot}
+               
+            """
+            #### DEPRACATED CODE ####
             """
             url = "https://www.uniprot.org/uploadlists/"
 
@@ -110,6 +131,16 @@ class Sequence(Attributes):
 
 
             return mapping
+            """
+            job_id = submit_id_mapping(from_db = "UniProtKB_AC-ID", to_db = to,ids=uniprot_accs)
+            
+            if check_id_mapping_results_ready(job_id):
+                link = get_id_mapping_results_link(job_id)
+                results = get_id_mapping_results_search(link)
+                print(results["results"][1:2])
+                mapping= {x["from"] : x["to"]["uniProtkbId"] for x in results["results"]}
+                return mapping
+            
 
         def try_fetch_database(uniprotaccs, db, iteration=0):
             import time

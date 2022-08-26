@@ -493,8 +493,8 @@ class Structure(Attributes):
 
         pdb_list_series = pd.Series(pdblist)
 
-        if self.PARALLEL:
-            print("parralel processing")
+        if self.PARALLEL and not pdb_list_series.empty:
+            print("parralel processing", pdb_list_series)
             dataset_list_dataframe = pdb_list_series.parallel_apply(lambda x: process_pdb(x, pdb_uniprot_mapping, datatype, domname=domname))
         else:
             dataset_list_dataframe = pdb_list_series.progress_apply(lambda x: process_pdb(x,pdb_uniprot_mapping, datatype, domname=domname))
