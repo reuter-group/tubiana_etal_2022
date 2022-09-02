@@ -132,13 +132,13 @@ class Sequence(Attributes):
 
             return mapping
             """
-            job_id = submit_id_mapping(from_db = "UniProtKB_AC-ID", to_db = to,ids=uniprot_accs)
+            job_id = submit_id_mapping(from_db = "UniProtKB_AC-ID", to_db = to,ids=uniprotAccs)
             
             if check_id_mapping_results_ready(job_id):
                 link = get_id_mapping_results_link(job_id)
                 results = get_id_mapping_results_search(link)
                 print(results["results"][1:2])
-                mapping= {x["from"] : x["to"]["uniProtkbId"] for x in results["results"]}
+                mapping= {x["from"] : x["to"]["representativeMember"]["accessions"][0] for x in results["results"]}
                 return mapping
             
 
@@ -162,9 +162,9 @@ class Sequence(Attributes):
         uniprotaccs = uniprotaccs[np.logical_not(uniprotaccs == np.nan)]
         # print("> Database queries, if fail, start again later")
 
-        uniref50 = try_fetch_database(uniprotaccs, "NF50")
-        uniref90 = try_fetch_database(uniprotaccs, "NF90")
-        uniref100 = try_fetch_database(uniprotaccs, "NF100")
+        uniref50 = try_fetch_database(uniprotaccs, "UniRef50")
+        uniref90 = try_fetch_database(uniprotaccs, "UniRef90")
+        uniref100 = try_fetch_database(uniprotaccs, "UniRef100")
 
         print("> mapping with dataset")
         DATASET["uniref50"] = DATASET["uniprot_acc"].apply(

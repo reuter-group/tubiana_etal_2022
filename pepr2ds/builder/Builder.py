@@ -27,7 +27,8 @@ class Builder(Attributes.Attributes):
         beforeOptimisation = DATASET.memory_usage().sum() / 1024 ** 2
 
         print("Size BEFORE optimization {0:.2f} MB".format(beforeOptimisation))
-
+        
+        DATASET.head()
         DATASET["type"] = DATASET["type"].astype("category")
         DATASET["sec_struc"] = DATASET["sec_struc"].astype("category")
         DATASET["sec_struc_full"] = DATASET["sec_struc_full"].astype("category")

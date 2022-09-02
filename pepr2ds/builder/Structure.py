@@ -215,14 +215,17 @@ class Structure(Attributes):
         # sasa_res_mdtraj = md.shrake_rupley(pdbmd, mode="residue")[0] #sasa per atoms
         # sasa_atom_mdtraj = md.shrake_rupley(pdbmd, mode="atom")[0] #sasa per atoms
 
-        p = PDBParser(QUIET=True)
+        p = PDBParser(QUIET=False)
         structure = p.get_structure("struc", pdbpath)
         # Calcul FreeSasa
         struc_freesasa = freesasa.Structure(pdbpath)
         sasaFreesasa = freesasa.calc(struc_freesasa)
 
         model = structure[0]
-        dssp = DSSP(model, pdbpath, dssp="mkdssp")
+        try:
+            dssp = DSSP(model, pdbpath, dssp="mkdssp")
+        except Exception as e:
+            print(pdbpath, e)
 
 
         ssResSmooth, sasa_res = zip(*[(self.simplify_SS(dssp[x][2]),
@@ -502,7 +505,7 @@ class Structure(Attributes):
 
         dataset_list_dataframe = dataset_list_dataframe.tolist()
 
-        # print(dataset_list_dataframe)
+        print(dataset_list_dataframe)
         try:
             returndf = pd.concat(dataset_list_dataframe)
             return returndf
