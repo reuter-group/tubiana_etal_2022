@@ -197,7 +197,10 @@ class Structure(Attributes):
                     "GLU": 223}
 
         pdbdf = PandasPdb().read_pdb(pdbpath).df["ATOM"]
-
+        #pdbdf.drop_duplicates
+        
+        """
+        
         #remove duplicated residues.
         pdbdf = pdbdf.drop_duplicates(subset=["atom_name","chain_id","residue_number"])
 
@@ -205,6 +208,8 @@ class Structure(Attributes):
         lastresid = pdbdf.residue_number.values[-1]
         if len(pdbdf.query('residue_number == @lastresid')) == 1:
             pdbdf = pdbdf.query("residue_number != @lastresid")
+            
+        """
 
         ########################
         # calculate dssp and SASA
@@ -218,8 +223,12 @@ class Structure(Attributes):
         p = PDBParser(QUIET=False)
         structure = p.get_structure("struc", pdbpath)
         # Calcul FreeSasa
-        struc_freesasa = freesasa.Structure(pdbpath)
-        sasaFreesasa = freesasa.calc(struc_freesasa)
+        try:
+            struc_freesasa = freesasa.Structure(pdbpath)
+            sasaFreesasa = freesasa.calc(struc_freesasa)
+        except Exception as e:
+            print("FreeSASA problem", pdbpath, e)
+        
 
         model = structure[0]
         try:
@@ -227,12 +236,14 @@ class Structure(Attributes):
         except Exception as e:
             print(pdbpath, e)
 
-
+    
         ssResSmooth, sasa_res = zip(*[(self.simplify_SS(dssp[x][2]),
                                        dssp[x][3] * 100) for x in dssp.keys()])
 
 
         ssRes = [dssp[x][2] for x in dssp.keys()]
+        ids = [r_id[1] for c_id,r_id in dssp.keys()]
+        pdbdf = pdbdf[pdbdf["residue_number"].isin(ids)]
 
 
         # Structure for protein block (structural alphabet)
@@ -267,6 +278,7 @@ class Structure(Attributes):
         atoms_list = pdbdf.atom_number.values
         #residues_list = list(structure.get_residues())
         residues_list = pdbdf.residue_number.values
+        residues_insertion_list = pdbdf.insertion.values
 
         residues_index = {res:index for index,res in enumerate(pdbdf.residue_number.unique())}
         # residues_index = {
@@ -284,7 +296,9 @@ class Structure(Attributes):
             ssFullAtom.append(ssRes[resIndex])
             pbAtom.append(proteinBlocks[resIndex])
             sasa_res_atom.append(sasa_res[resIndex])
-            residue_sasa_florian = freesasa.selectArea([f"x, resi {residue_number}"], struc_freesasa, sasaFreesasa)["x"]
+                                   
+            ## Note that FreeSaSa needs the insertion information of residues                       
+            residue_sasa_florian = freesasa.selectArea([f"x, resi {residue_number}" + residues_insertion_list[i]], struc_freesasa, sasaFreesasa)["x"]
             ASA_res_freesasa_florian.append(residue_sasa_florian)
             # freesasa_atom_atom.append(sasaFreesasa.atomArea(i))
             if resName == "GLY": #GLY don't have sidechains. We will set the value at 0 (exposition = 0)
@@ -373,14 +387,14 @@ class Structure(Attributes):
             print(e)
         for i in range(len(lines)):
             if lines[i].startswith("ATOM"):
-                # REMOVE ALTERNATIV COLUMNS
+                #REMOVE ALTERNATIV COLUMNS
                 if lines[i][16:17] != " ":
                     lines[i] = lines[i][:16] + " " + lines[i][17:]
                     change = True
-                if lines[i][26:27] != " ":
-                    lines[i] = lines[i][:26] + " " + lines[i][27:]
-                    change = True
-                # Change 'OXT' terminus oxigen into a regular O, otherwise dssp will not work
+                #if lines[i][26:27] != " ":
+                    #lines[i] = lines[i][:26] + " " + lines[i][27:]
+                    #change = True
+                #Change 'OXT' terminus oxigen into a regular O, otherwise dssp will not work
                 if lines[i][12:16] == "OXT":
                     lines[i] = lines[i][:12] + "O  " + lines[i][16:]
                     change = True
