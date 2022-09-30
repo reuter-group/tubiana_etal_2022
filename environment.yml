@@ -6,6 +6,8 @@ channels:
 - tpeulen
 - speleo3
 dependencies:
+- python=3.7
+- ipython
 - seaborn
 - pandas==1.1.5
 - biopandas

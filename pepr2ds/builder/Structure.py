@@ -199,6 +199,10 @@ class Structure(Attributes):
         pdbdf = PandasPdb().read_pdb(pdbpath).df["ATOM"]
         #pdbdf.drop_duplicates
         
+        ############################################################################################################### 
+        
+        ## I think there is no need to remove dulicates or the Ns at the end. DSSP already seems to take care of these cases
+        
         """
         
         #remove duplicated residues.
@@ -209,7 +213,9 @@ class Structure(Attributes):
         if len(pdbdf.query('residue_number == @lastresid')) == 1:
             pdbdf = pdbdf.query("residue_number != @lastresid")
             
-        """
+         """
+        
+        ################################################################################################################
 
         ########################
         # calculate dssp and SASA
@@ -239,12 +245,15 @@ class Structure(Attributes):
     
         ssResSmooth, sasa_res = zip(*[(self.simplify_SS(dssp[x][2]),
                                        dssp[x][3] * 100) for x in dssp.keys()])
-
-
+            
+        
+        #################################################################################################################
+        # This part was added so that only residues that have been computed with dssp are chosen in pdbdf. In short to 
+        # align the datasets. Otherwise we get out of bounds error later in the code
         ssRes = [dssp[x][2] for x in dssp.keys()]
         ids = [r_id[1] for c_id,r_id in dssp.keys()]
         pdbdf = pdbdf[pdbdf["residue_number"].isin(ids)]
-
+        #################################################################################################################
 
         # Structure for protein block (structural alphabet)
         # with io.capture_output(stderr=True, display = False) as capture:
@@ -391,9 +400,16 @@ class Structure(Attributes):
                 if lines[i][16:17] != " ":
                     lines[i] = lines[i][:16] + " " + lines[i][17:]
                     change = True
+                    
+                ## This part was commented because some important domains would not be added to the dataset.
+                ## Also It seem that dssp can now handle these kind of pdb files and the manipulation of such pdbfiles would
+                ## cause more problems
+                ## Note that other dataformats might be also a better idea like mmCIF for example.
                 #if lines[i][26:27] != " ":
                     #lines[i] = lines[i][:26] + " " + lines[i][27:]
                     #change = True
+                    
+                
                 #Change 'OXT' terminus oxigen into a regular O, otherwise dssp will not work
                 if lines[i][12:16] == "OXT":
                     lines[i] = lines[i][:12] + "O  " + lines[i][16:]

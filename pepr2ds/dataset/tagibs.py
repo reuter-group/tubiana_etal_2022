@@ -167,11 +167,16 @@ class Dataset():
 
 
         if data_type == 'cath':
+            print("data_type is cathpdb")
             df = df.query("data_type == 'cathpdb'")
         elif data_type == 'alfafold':
+            print("data_type is alfafold")
             df = df.query("data_type == 'alfafold'")
         elif data_type == 'cath+af':
+            print("data_type is cath+af")
             df = df.query("data_type in ['cathpdb','alfafold']")
+        else:
+            raise("Problem with datatype")
 
 
         df["matchIndex"] = list(range(len(df)))
@@ -376,7 +381,9 @@ class Dataset():
         """
         Return a datasert with only 1 data per choosed clusters.
         """
-
+        print("Uniref: ", Uniref)
+        print("Cathcluster: ", cathCluster)
+        print(pdbreference)
         if cathCluster not in ["S35", "S60", "S95", "S100"]:
             raise ValueError('CathCluster given not in ["S35","S60","S95","S100"]')
 
@@ -410,7 +417,9 @@ class Dataset():
                 return select
 
         dfReprCathNames = list(cathdf.groupby(["domain", cathCluster]).apply(selectUniqueCath).to_numpy())
-
+        
+        
+        df.to_csv('tmp_file.csv')
         if len(dfReprCathNames) > 0:
             excludeUniref = df.query(
                 "cathpdb in @dfReprCathNames").uniprot_acc.unique()  # Structures are prior to sequences.

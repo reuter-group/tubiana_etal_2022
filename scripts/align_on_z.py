@@ -295,7 +295,8 @@ def set_directory_path(folder):
     if folder == "cath":
         folder = "cath/domains"
     if system == "Linux":
-        directory_path = f"/mnt/g/work/projets/peprmint/databases/{folder}/"
+        print(os.getcwd())
+        directory_path = os.path.join(os.getcwd(),f"peprmint/databases/{folder}/")
     elif system == "Darwin":
         directory_path = f"/Users/thibault/Documents/WORK/peprmint/databases/{folder}/"
     else:

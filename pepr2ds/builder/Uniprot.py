@@ -1,3 +1,5 @@
+##For more information visit https://www.uniprot.org/help/id_mapping
+
 import re
 import time
 import json
