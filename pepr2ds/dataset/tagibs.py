@@ -381,9 +381,13 @@ class Dataset():
         """
         Return a datasert with only 1 data per choosed clusters.
         """
-        print("Uniref: ", Uniref)
-        print("Cathcluster: ", cathCluster)
-        print(pdbreference)
+        
+        # Prints for dubugging
+        
+        #print("Uniref: ", Uniref)
+        #print("Cathcluster: ", cathCluster)
+        #print(pdbreference)
+        
         if cathCluster not in ["S35", "S60", "S95", "S100"]:
             raise ValueError('CathCluster given not in ["S35","S60","S95","S100"]')
 
@@ -419,7 +423,7 @@ class Dataset():
         dfReprCathNames = list(cathdf.groupby(["domain", cathCluster]).apply(selectUniqueCath).to_numpy())
         
         
-        df.to_csv('tmp_file.csv')
+        # df.to_csv('tmp_file.csv') Only for debugging purpose
         if len(dfReprCathNames) > 0:
             excludeUniref = df.query(
                 "cathpdb in @dfReprCathNames").uniprot_acc.unique()  # Structures are prior to sequences.
