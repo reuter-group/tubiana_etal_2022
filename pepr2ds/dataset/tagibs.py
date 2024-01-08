@@ -481,7 +481,7 @@ class Dataset():
 
         return (ibs, nonibs)
 
-    def generate_picutre_of_IBS(self, subfolder='raw'):
+    def generate_picutre_of_IBS(self, subfolder='zaligned'):
         import MDAnalysis as mda
 
         cathfolder = f"{self.PEPRMINT_FOLDER}/databases/cath"
@@ -534,7 +534,7 @@ class Dataset():
 
 
     # START
-    def show_structure_and_plane(self, idpdb, folder='raw'):
+    def show_structure_and_plane(self, idpdb, folder='zaligned'):
         parser = PDB.PDBParser()
         from Bio.PDB.PDBExceptions import PDBConstructionWarning
         import warnings

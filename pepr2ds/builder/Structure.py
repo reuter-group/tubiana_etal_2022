@@ -362,7 +362,7 @@ class Structure(Attributes):
             None
         """
         f = open(pdb_path, "r")
-        outpath = pdb_path.replace("raw","cleaned")
+        outpath = pdb_path.replace("zaligned","cleaned")
         change = False
 
         try:
@@ -561,7 +561,7 @@ class Structure(Attributes):
         if not self.RECALCULATE:
             return None
 
-        pdblist = [str(x) for x in Path(self.CATHFOLDER).glob("domains/**/raw/*.pdb")]
+        pdblist = [str(x) for x in Path(self.CATHFOLDER).glob("domains/**/zaligned/*.pdb")]
         pdblist_alphafold = ([str(x) for x in Path(self.ALPHAFOLDFOLDER).glob("**/extracted/*.pdb")])  # impl:AFS
 
         allpdbs = pdblist + pdblist_alphafold
@@ -907,6 +907,7 @@ class Structure(Attributes):
         ]
         cathDomains = pd.read_csv(self.CATHFOLDER + domfile, comment="#", sep=r"\s+", header=None)
         cathDomains.columns = colomnDomFile
+
         # Renumber the clusters
         cathDomains["S35"] = cathDomains["S35"].astype(str)
         cathDomains["S60"] = cathDomains["S35"] + "." + cathDomains["S60"].astype(str)
@@ -918,7 +919,13 @@ class Structure(Attributes):
         ]
 
         # Merging with the previous dataset, on cathPDB.
+        print(f"**********")
+        print(f"**********")
+        print(f"original dataset len: {len(DATASET.index)}")
         DATASET_cath= pd.merge(DATASET, cathDomains, on="cathpdb")
+        print(f"modified dataset len: {len(DATASET.index)}")
+        print(f"**********")
+        print(f"**********")
         DATASET_af = DATASET.query("data_type == 'alphafold'")
         DATASET = pd.concat([DATASET_cath, DATASET_af])
         return DATASET

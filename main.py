@@ -58,6 +58,7 @@ def main():
     #global_settings = Settings("/opt/cbu/my.config")  # different config file
 
     # support to specify superfamilies not implemented by default
+    '''
     global_settings.add_new_superfamily(name = "C1",
                                         ref_pdb = "1ptrA00", # reference for tagging IBS
                                         ref_res1 = "243",
@@ -67,14 +68,16 @@ def main():
                                         prosite_domain = "PS50081",
                                         interpro_domain = None,
                                         refine_AF_data_with_interpro = False)
+    '''
  
     # notebook #1
     data_retriever = DataRetriever(global_settings)
-    data_retriever.fetch()
+    #data_retriever.fetch()
+    data_retriever.populate_from_local_data(path_to_data='/scratch/cbu/tmp/')
 
     # superposition and reorientation of downloaded PDBs
     preprocess = Preprocessing(global_settings)
-    preprocess.run(database="cath", verbose=False, use_cath_superpose=False)
+    #preprocess.run(database="cath", verbose=False, use_cath_superpose=False)
 
     # alternative, pairwise superimposition. NB! Might take too much time!
     #preprocess.run(database="cath", use_cath_superpose=True)

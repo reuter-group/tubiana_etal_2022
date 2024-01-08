@@ -48,6 +48,9 @@ from collections import defaultdict
 
 import os
 import shutil
+from pathlib import Path
+import glob
+import subprocess
 import urllib
 import tarfile
 import gzip
@@ -81,6 +84,55 @@ class DataRetriever:
         self._copy_ref_pdb_files()
         
         return True
+
+    def populate_from_local_data(self, path_to_data):
+        """ Skip the CATH download step and copy files in the given directory
+        instead. NB! Assuming that the files corresponding to superfamilies
+        active in the peprmint_default.config file are available in the local
+        folder!
+        """
+        if self.settings.FORMER_WORKING_DIR:
+            print('WARNING! Working directory already exists! Please remove it before proceeding in this use case')
+
+        print(f'> Data retriever **WITH LOCAL FILES** (domains selected in .config file: {self.settings.active_superfamilies})')
+        
+        self._copy_files_to_cath_folder(path_to_data)
+        self._retrieve_cath_domains()
+        self._retrieve_uniprot_to_pdb_correspondence()
+        self._retrieve_prosite()
+        
+        return True
+
+    def _copy_files_to_cath_folder(self, path_to_data):
+        prefix = self.settings.CATHFOLDER
+        aligned_suffix = self.settings.ALIGNED_SUBDIR
+
+        for domain in self.settings.active_superfamilies:
+            raw_folder = prefix + 'domains/' + domain + '/raw/'
+            cleaned_folder = prefix + 'domains/' + domain + '/cleaned/'
+            aligned_folder = prefix + 'domains/' + domain + '/' + aligned_suffix + '/'
+
+            if not os.path.exists(raw_folder):
+                os.makedirs(raw_folder)
+            if not os.path.exists(cleaned_folder):
+                os.makedirs(cleaned_folder)
+            if not os.path.exists(aligned_folder):
+                os.makedirs(aligned_folder)
+
+            # copy each file into the expected folder
+            filelist = Path(path_to_data).glob(f"{domain}/*.pdb")
+            for f in filelist:
+                out_name = aligned_folder + os.path.basename(f)
+                exec_cmd = "cp " + str(f) + " " + out_name
+                about = subprocess.run(exec_cmd, shell=True, capture_output=False)
+
+            # save a copy of the reference structure in the expected folder
+            ref_pdb = self.settings.config_file['PREPROCESSING']["ref_"+domain+"_pdb"]
+            if ref_pdb is not None:
+                original = aligned_folder + ref_pdb + '.pdb'
+                out_name = self.settings.REF_FOLDER + ref_pdb + '.pdb'
+                exec_cmd = "cp " + original + " " + out_name
+                about = subprocess.run(exec_cmd, shell=True, capture_output=False)
 
     def _retrieve_cath_domains(self):
         # TO DO: release 4_2_0 or latest?

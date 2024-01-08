@@ -253,7 +253,7 @@ class Widgets():
                 pdbname = self.pdbWidget.value
 
                 if domain and pdbname:
-                    structure = self.parent.CATHFOLDER + "domains/" + domain + "/raw/" + pdbname + ".pdb"
+                    structure = self.parent.CATHFOLDER + "domains/" + domain + "/zaligned/" + pdbname + ".pdb"
                     self.mdaMol = mda.Universe(structure)
                     # cog = self.mdaMol.atoms.center_of_geometry()
                     # self.mdaMol.atoms.translate(-cog)
