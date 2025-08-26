@@ -6,10 +6,10 @@ channels:
 - tpeulen
 - speleo3
 dependencies:
-- python=3.7
+- python>=3.9
 - pytest
-- main::boost
-- main::libboost
+- boost-cpp=1.73.*      
+- boost=1.73.*          
 - seaborn
 - pandas
 - biopandas
@@ -20,7 +20,7 @@ dependencies:
 - tqdm
 - xmltodict
 - pathlib
-- dssp
+- salilab::dssp
 - pytables
 - termcolor
 - requests
@@ -30,7 +30,7 @@ dependencies:
 - wordcloud
 - nglview
 - mdanalysis
-- weasyprint
+- weasyprint==52.5
 - openpyxl
 - pymol-open-source
 - tmalign
@@ -42,3 +42,5 @@ dependencies:
   - vg
   - pandarallel
   - ipyfilechooser
+  - pyphen==0.12.0
+  - ipykernel
