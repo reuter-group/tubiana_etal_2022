@@ -258,6 +258,7 @@ Examples:
             input_folder=args.input_folder,
             domain_name=args.domain_name,
             output_csv=args.output_csv,
+            compute_extra_features=args.compute_extra_features
         )
         
         print(f"\nSummary:")

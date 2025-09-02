@@ -255,7 +255,10 @@ class DatasetManager:
 
     def add_uniprot_basic_info(self):
         print(">>> add_uniprot_basic_info()...")
-        self.DATASET = self.builder.sequence.add_uniprotId_Origin(self.DATASET)
+        try:
+            self.DATASET = self.builder.sequence.add_uniprotId_Origin(self.DATASET)
+        except Exception as e:
+            print(f"Error adding UniProt basic info: {e}")
 
     def add_prosite_info(self):
         print(">>> add_prosite_info()...")

@@ -151,9 +151,9 @@ class Preprocessing:
                 exec_list.append(cmd)
 
         # joblib 'Parallel' documentation: "-1 all CPUs are used"
-        Parallel(n_jobs=-1)(delayed(self.__exec_single_cmd)(job) for job in exec_list)
+        Parallel(n_jobs=-1)(delayed(self._exec_single_cmd)(job) for job in exec_list)
 
-    def __exec_single_cmd(self, exec_cmd):
+    def _exec_single_cmd(self, exec_cmd):
         about = subprocess.run(exec_cmd, shell=True, capture_output=True)
         """
         # if debugging
@@ -183,9 +183,9 @@ class Preprocessing:
                     file_pairs.append((f,tmaligned_file))
 
         # joblib 'Parallel' documentation: "-1 all CPUs are used"
-        Parallel(n_jobs=-1)(delayed(self.__fix_single_tmalign_pdb)(files) for files in file_pairs)
+        Parallel(n_jobs=-1)(delayed(self._fix_single_tmalign_pdb)(files) for files in file_pairs)
 
-    def __fix_single_tmalign_pdb(self, file_paths):
+    def _fix_single_tmalign_pdb(self, file_paths):
         """
         TMalign repeats the reference protein as chain "B" in the output file,
         so we update the aligned file with the (superimposed) target from chain
